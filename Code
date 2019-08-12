@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    button {
+  color: #cc0000;
+}
+    canvas {
+      border: 1px solid #d3d3d3;
+      background-color: #ffffff;
+    }
+  </style>
+</head>
+
+<body onload="startGame()">
+  <script>
+    var myGamePiece;
+    var myObstacles = [];
+
+    function startGame() {
+      myGamePiece = new component(50, 50, "https://previews.dropbox.com/p/thumb/AAiLfjEGb01QNvvG3vPEkRfkOU2St1k86plyr4DRcJ01lrLPjZeoYoRS2vo13zL6D1UyqhPDXGkqIs5UlTbcZGphps7lKSNEyeAEIiztZZtByjfwJAwJzRbSQfBnn1o7BOtLv2Ifi8rvTfECzfEvDpI77c1Dx0OPUoIuR9LbjkIgoXC2p3M2BKggK77MwO5GG95nixN3dvKpVJUx-JRsFS2fEqTe0LQCaYzQ4fHElMLXj7deL7Kx8KwUBjIqaFLN9p6H7f7TSJ-Tv7ZcxWol8Mp9eJ1R8wcNfl97hiNzPydc0WCtbY8-82JNVEkNoVd9KO97BNJWMwTlNpi6TpFAs2ob/p.jpeg?fv_content=true&size_mode=5", 10, 100, "image");
+      myObstacle = new component(10, 100, "https://previews.dropbox.com/p/thumb/AAhaXBmL4dctQTlncO2fjJvCjW6zsHsFAHy2ZA7r8OAvtc1PhfEB02-TbZKEAQPNdBkE5E-USd0aeH8N17oooS6OwVSHvUwpwTNdkvxl2EVTKEo5iEOPeLp9QN4DTkAGibwFIrt4Jyylt6otg0apOJofUEcabarMEWvhSGZvmzEmur7mHdrncUkbWx6DJpDvb6Hnc0ORqSJeVWlfkTqNVgBX8MeKiWNvGpHshJa1Q8lICJlJplv2BEuvI89aY0TmnQEwWiXjiMf_SSZeaJ5lCSRhelKAlTx__VQRuHfUQ2ccxdhuCnKGIzdQQlDbVEFtNkCkfcJnzLbpLy7Ch2oxJZ74/p.jpeg?fv_content=true&size_mode=5", 140, 160, "image");
+      myGameArea.start();
+    }
+    var myGameArea = {
+      canvas: document.createElement("canvas"),
+      start: function() {
+        this.canvas.width = 650;
+        this.canvas.height = 270;
+        this.context = this.canvas.getContext("2d");
+        document.body.insertBefore(this.canvas, document.body.childNodes[0]);
+        this.frameNo = 0;
+        this.interval = setInterval(updateGameArea, 20);
+      },
+      clear: function() {
+        this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+      },
+      stop: function() {
+        clearInterval(this.interval);
+      }
+    }
+
+function component(width, height, color, x, y, type) {
+    this.type = type;
+  if (type == "image") {
+    this.image = new Image();
+    this.image.src = color;
+  }
+    this.width = width;
+    this.height = height;
+    this.speedX = 0;
+    this.speedY = 0;    
+    this.x = x;
+    this.y = y;    
+    this.update = function() {
+        ctx = myGameArea.context;
+        if (type == "image") {
+      ctx.drawImage(this.image, 
+        this.x, 
+        this.y,
+        this.width, this.height);
+    } else {
+            ctx.fillStyle = color;
+            ctx.fillRect(this.x, this.y, this.width, this.height);
+        }
+    }
+    this.newPos = function() {
+        this.x += this.speedX;
+        this.y += this.speedY;        
+    }
+    this.crashWith = function(otherobj) {
+        var myleft = this.x;
+        var myright = this.x + (this.width);
+        var mytop = this.y;
+        var mybottom = this.y + (this.height);
+        var otherleft = otherobj.x;
+        var otherright = otherobj.x + (otherobj.width);
+        var othertop = otherobj.y;
+        var otherbottom = otherobj.y + (otherobj.height);
+        var crash = true;
+        if ((mybottom < othertop) || (mytop > otherbottom) || (myright < otherleft) || (myleft > otherright)) {
+            crash = false;
+        }
+        return crash;
+    }
+}
+
+
+function updateGameArea() {
+    var x, y;
+    for (i = 0; i < myObstacles.length; i += 1) {
+        if (myGamePiece.crashWith(myObstacles[i])) {
+            myGameArea.stop();
+            return;
+        } 
+    }
+    myGameArea.clear();
+    myGameArea.frameNo += 1;
+    if (myGameArea.frameNo == 1 || everyinterval(150)) {
+        x = myGameArea.canvas.width;
+        minHeight = 50;
+        maxHeight = 200;
+        height = Math.floor(Math.random()*(maxHeight-minHeight+1)+minHeight)
+        minGap = 60;
+        maxGap = 70;
+        gap = Math.floor(Math.random()*(maxGap-minGap+1)+minGap);
+        myObstacles.push(new component(70, height, "https://previews.dropbox.com/p/thumb/AAhaXBmL4dctQTlncO2fjJvCjW6zsHsFAHy2ZA7r8OAvtc1PhfEB02-TbZKEAQPNdBkE5E-USd0aeH8N17oooS6OwVSHvUwpwTNdkvxl2EVTKEo5iEOPeLp9QN4DTkAGibwFIrt4Jyylt6otg0apOJofUEcabarMEWvhSGZvmzEmur7mHdrncUkbWx6DJpDvb6Hnc0ORqSJeVWlfkTqNVgBX8MeKiWNvGpHshJa1Q8lICJlJplv2BEuvI89aY0TmnQEwWiXjiMf_SSZeaJ5lCSRhelKAlTx__VQRuHfUQ2ccxdhuCnKGIzdQQlDbVEFtNkCkfcJnzLbpLy7Ch2oxJZ74/p.jpeg?fv_content=true&size_mode=5", x, 0, "image"));
+      myObstacles.push(new component(70, x-height-gap, "https://previews.dropbox.com/p/thumb/AAhaXBmL4dctQTlncO2fjJvCjW6zsHsFAHy2ZA7r8OAvtc1PhfEB02-TbZKEAQPNdBkE5E-USd0aeH8N17oooS6OwVSHvUwpwTNdkvxl2EVTKEo5iEOPeLp9QN4DTkAGibwFIrt4Jyylt6otg0apOJofUEcabarMEWvhSGZvmzEmur7mHdrncUkbWx6DJpDvb6Hnc0ORqSJeVWlfkTqNVgBX8MeKiWNvGpHshJa1Q8lICJlJplv2BEuvI89aY0TmnQEwWiXjiMf_SSZeaJ5lCSRhelKAlTx__VQRuHfUQ2ccxdhuCnKGIzdQQlDbVEFtNkCkfcJnzLbpLy7Ch2oxJZ74/p.jpeg?fv_content=true&size_mode=5", x, height + gap, "image"));
+    }
+    for (i = 0; i < myObstacles.length; i += 1) {
+        myObstacles[i].x += -1;
+        myObstacles[i].update();
+    }
+    myGamePiece.newPos();    
+    myGamePiece.update();
+}
+
+function everyinterval(n) {
+    if ((myGameArea.frameNo / n) % 1 == 0) {return true;}
+    return false;
+}
+
+
+      function moveup() {
+        myGamePiece.speedY = -2;
+      }
+
+      function movedown() {
+        myGamePiece.speedY = 2;
+      }
+
+      function moveleft() {
+        myGamePiece.speedX = -2;
+      }
+
+      function moveright() {
+        myGamePiece.speedX = 2;
+      }
+
+      function clearmove() {
+        myGamePiece.speedX = 0;
+        myGamePiece.speedY = 0;
+      }
+  </script>
+  
+
+  <div style="text-align:center;width:480px;">
+    
+  <button onmousedown="moveup()" onmouseup="clearmove()" ontouchstart="moveup()">UP</button><br><br>
+  <button onmousedown="moveleft()" onmouseup="clearmove()" ontouchstart="moveleft()">LEFT</button>
+  <button onmousedown="moveright()" onmouseup="clearmove()" ontouchstart="moveright()">RIGHT</button><br><br>
+  <button onmousedown="movedown()" onmouseup="clearmove()" ontouchstart="movedown()">DOWN</button>
+</div>
+</body>
+
+</html>
